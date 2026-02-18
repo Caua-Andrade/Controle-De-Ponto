@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Controle de Ponto</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #0f172a;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+
+    .card {
+        background: #1e293b;
+        padding: 25px;
+        border-radius: 15px;
+        width: 100%;
+        max-width: 400px;
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    input {
+        width: 100%;
+        padding: 12px;
+        margin: 8px 0 15px 0;
+        border-radius: 8px;
+        border: none;
+        font-size: 16px;
+    }
+
+    button {
+        width: 100%;
+        padding: 14px;
+        border-radius: 8px;
+        border: none;
+        background: #22c55e;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    .resultado {
+        margin-top: 20px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+        white-space: pre-line;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="card">
+    <h2>Controle de Ponto</h2>
+
+    <label>Início do trabalho</label>
+    <input type="time" id="inicioTrabalho" step="60">
+
+    <label>Início da pausa</label>
+    <input type="time" id="inicioPausa" step="60">
+
+    <label>Fim da pausa</label>
+    <input type="time" id="fimPausa" step="60">
+
+    <button onclick="calcularSaida()">Calcular horário de saída</button>
+
+    <div class="resultado" id="resultado"></div>
+</div>
+
+<script>
+function calcularSaida() {
+
+    const inicioTrabalho = document.getElementById("inicioTrabalho").value;
+    const inicioPausa = document.getElementById("inicioPausa").value;
+    const fimPausa = document.getElementById("fimPausa").value;
+
+    if (!inicioTrabalho || !inicioPausa || !fimPausa) {
+        alert("Preencha todos os campos!");
+        return;
+    }
+
+    const HORAS_OBRIGATORIAS = 6;
+
+    function paraMinutos(horario) {
+        const [h, m] = horario.split(":").map(Number);
+        return h * 60 + m;
+    }
+
+    let inicio = paraMinutos(inicioTrabalho);
+    let pausaInicio = paraMinutos(inicioPausa);
+    let pausaFim = paraMinutos(fimPausa);
+
+    if (pausaInicio < inicio) {
+        pausaInicio += 24 * 60;
+    }
+
+    if (pausaFim < pausaInicio) {
+        pausaFim += 24 * 60;
+    }
+
+    const duracaoPausa = pausaFim - pausaInicio;
+
+    const saidaMin = inicio + (HORAS_OBRIGATORIAS * 60) + duracaoPausa;
+
+    const horas = Math.floor((saidaMin / 60) % 24);
+    const minutos = saidaMin % 60;
+
+    const horarioFormatado =
+        String(horas).padStart(2, "0") + ":" +
+        String(minutos).padStart(2, "0");
+
+    document.getElementById("resultado").innerText =
+        "Você poderá sair às: " + horarioFormatado +
+        "\nTempo de pausa: " + duracaoPausa + " minutos";
+}
+</script>
+
+</body>
+</html>
